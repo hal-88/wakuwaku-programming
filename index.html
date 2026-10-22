@@ -563,7 +563,7 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
   var overBan = document.createElement('div');
   overBan.className = 'overban';
   overBan.setAttribute('aria-live', 'polite');
-  overBan.innerHTML = '100をこえたよ！<small>ここでストップ！</small>';
+  overBan.innerHTML = '100をこえたよ！';
   boardEl.appendChild(overBan);
   function showOver(){
     overBan.classList.remove('show');
@@ -599,7 +599,7 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
   }
 
   // ---------- 実行 ----------
-  var running = false, timer = null, acts = [], ai = 0;
+  var running = false, timer = null, acts = [], ai = 0, overLate = false;
   var DELAYS = [450, 340, 250, 185, 135, 100, 75, 56, 42, 32, 24];
   function compile(){
     var out = [], cur = 1, steps = 0;
@@ -619,7 +619,7 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
     return out;
   }
   function apply(a){
-    if (a.t === 'over') { showOver(); return; }
+    if (a.t === 'over') { if (a.last) overLate = true; else showOver(); return; }
     if (a.t === 'paint') { if (a.n >= 1 && a.n <= 100) { (paints[a.n] = paints[a.n] || []).push(a.c); } }
     else { curPos = a.n; }
   }
@@ -641,7 +641,7 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
     }
     renderBoard();
     if (ai < acts.length) timer = setTimeout(tick, d);
-    else { setRunning(false); if (acts.over) showOver(); judge(); }
+    else { setRunning(false); var ok = judge(); if (overLate && !ok) showOver(); }
   }
   runBtn.addEventListener('click', function(){
     ensureAudio();
@@ -650,6 +650,10 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
     if (!root.children.length) { setResult('ブロックを入れてからスタートしよう', ''); return; }
     try { acts = compile(); }
     catch (e) { setResult('プログラムが長すぎるよ。くり返しの回数を見直そう', 'ng'); return; }
+    // さいごに100をこえて、そのあと数表に何もしないときは、正解したら「100をこえたよ」を出さない
+    for (var j = acts.length - 1; j >= 0 && acts[j].t !== 'over'; j--) { if (acts[j].n <= 100) break; }
+    if (j >= 0 && acts[j].t === 'over') acts[j].last = true;
+    overLate = false;
     wipe();
     setResult('', '');
     ai = 0;
@@ -904,7 +908,7 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
   }
   function judge(){
     var m = MISSIONS[mi];
-    if (!m.target) { setResult('おわり！どんな もようになったかな？', ''); return; }
+    if (!m.target) { setResult('おわり！どんな もようになったかな？', ''); return false; }
     var miss = 0;
     wrong = {};
     for (var n = 1; n <= 100; n++) {
@@ -913,13 +917,14 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
       if (bad) { wrong[n] = true; miss++; }
     }
     renderBoard();
-    if (miss) { setResult('おしい！ちがうマスが ' + miss + 'こ あるよ（点線のマス）', 'ng'); return; }
+    if (miss) { setResult('おしい！ちがうマスが ' + miss + 'こ あるよ（点線のマス）', 'ng'); return false; }
     var stars = 1 + (m.s2 && m.s2.f() ? 1 : 0) + (m.s3 && m.s3.f() ? 1 : 0);
     var maxS = 1 + (m.s2 ? 1 : 0) + (m.s3 ? 1 : 0);
     if (!best[mi] || stars > best[mi]) { best[mi] = stars; saveBest(); buildSelect(); }
     var starStr = '★★★'.slice(0, stars) + '☆☆☆'.slice(0, maxS - stars);
     setResult('ミッションクリア！ ' + starStr, 'ok', m.after || (stars < maxS ? 'もっと星をとれるかな？' : 'パーフェクト！'));
     celebrate(m, stars, maxS, m.after || (stars < maxS ? 'もっと星をとれるかな？' : 'すべての星をゲット！'));
+    return true;
   }
 
   // ---------- ミッションの表示 ----------
