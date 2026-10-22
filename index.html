@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>わくわくプログラミング</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F6F8; --surface:#FFFFFF; --ink:#1E3348; --sub:#5F7387; --line:#D7E0E8; --muted:#E8EEF3;
+  --grid:#A9B8C5; --cellbg:#FFFFFF;
+  --c-blue:#3E9BE0; --c-red:#E5574F; --c-yellow:#F0BE2A; --c-green:#36B36F; --c-purple:#9161D0;
+  --b-repeat:#0F8A55; --b-if:#E2566E; --b-paint:#2496CC; --b-move:#F0B000; --b-reset:#E0742A; --b-start:#5FA82A;
+  --ok:#2E8B57; --okText:#FFFFFF; --ng:#C23B32; --sel:#1E3348;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141B22; --surface:#1C252F; --ink:#E5ECF2; --sub:#9DB0C2; --line:#2B3946; --muted:#24303C;
+    --grid:#4A5C6D; --cellbg:#1C252F; --ok:#4DB57D; --okText:#0E1A13; --ng:#EF7A70; --sel:#E5ECF2;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141B22; --surface:#1C252F; --ink:#E5ECF2; --sub:#9DB0C2; --line:#2B3946; --muted:#24303C;
+  --grid:#4A5C6D; --cellbg:#1C252F; --ok:#4DB57D; --okText:#0E1A13; --ng:#EF7A70; --sel:#E5ECF2;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif;-webkit-text-size-adjust:100%}
+button,select{font:inherit;touch-action:manipulation}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible{outline:3px solid var(--ok);outline-offset:2px}
+main{max-width:1180px;margin:0 auto;padding:14px 18px 40px}
+
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:10px}
+h1{font-size:1.35rem;font-weight:900;margin:0 auto 0 0;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.lockform{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.lockform[hidden]{display:none}
+.lockform input{font:inherit;font-size:1.15rem;font-weight:700;padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink);width:10em}
+.msel{font-size:1rem;font-weight:700;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);min-width:15em}
+
+.mission{background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:flex-start;margin-bottom:14px}
+.mtext{flex:1;min-width:240px}
+.mname{font-size:.9rem;font-weight:700;color:var(--sub)}
+.mtitle{font-size:1.35rem;font-weight:900;margin:2px 0 6px}
+.mhint{font-size:.92rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+.stars{display:flex;flex-wrap:wrap;gap:6px}
+.stars span{font-size:.85rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--muted);color:var(--ink)}
+.target{display:grid;grid-template-columns:repeat(10,1fr);width:210px;border:1.5px solid var(--ink)}
+.target[hidden]{display:none}
+.mission{touch-action:pan-y}
+.mname,.mtitle,.mhint,.stars,.target{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.target div{aspect-ratio:1;border:.5px solid var(--grid);font-size:.55rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+.work{display:grid;grid-template-columns:minmax(290px,440px) 1fr;gap:20px;align-items:start}
+@media (max-width:780px){ .work{grid-template-columns:1fr} }
+
+.board{position:relative;display:grid;grid-template-columns:repeat(10,1fr);border:2px solid var(--ink);background:var(--cellbg)}
+.overban{position:absolute;left:50%;top:50%;z-index:5;transform:translate(-50%,-50%) scale(0);background:#E5574F;color:#fff;font-weight:900;font-size:clamp(1.3rem,5vw,2rem);padding:14px 22px;border-radius:16px;border:4px solid #fff;box-shadow:0 8px 30px rgba(0,0,0,.4);white-space:nowrap;text-align:center;pointer-events:none;opacity:0}
+.overban small{display:block;font-size:.6em;margin-top:2px}
+.overban.show{animation:overIn 2.4s ease forwards}
+@keyframes overIn{0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-10deg)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.15) rotate(3deg)}20%{transform:translate(-50%,-50%) scale(1) rotate(0)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}
+.cell{aspect-ratio:1;border:1px solid var(--grid);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:clamp(.72rem,1.7vw,1rem);position:relative}
+.cell.cur::after{content:"";position:absolute;right:-20%;bottom:-12%;width:82%;height:82%;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M19 64 Q32 50 45 64Z' fill='%233E9BE0'/><g fill='%233B2416'><circle cx='20' cy='22' r='12'/><circle cx='32' cy='15' r='14'/><circle cx='44' cy='22' r='12'/><circle cx='14' cy='33' r='9'/><circle cx='50' cy='33' r='9'/><circle cx='32' cy='25' r='15'/></g><circle cx='32' cy='39' r='12.5' fill='%23F2C39A'/><g fill='%233B2416'><circle cx='21' cy='31' r='5.5'/><circle cx='26.5' cy='28.8' r='5.5'/><circle cx='32' cy='28.2' r='5.6'/><circle cx='37.5' cy='28.8' r='5.5'/><circle cx='43' cy='31' r='5.5'/><circle cx='19.6' cy='36.5' r='4'/><circle cx='44.4' cy='36.5' r='4'/></g><ellipse cx='27.5' cy='38' rx='1.8' ry='2.4' fill='%23222'/><ellipse cx='36.5' cy='38' rx='1.8' ry='2.4' fill='%23222'/><circle cx='24.5' cy='43' r='2.3' fill='%23F59A9A' opacity='.7'/><circle cx='39.5' cy='43' r='2.3' fill='%23F59A9A' opacity='.7'/><path d='M28 44.5 Q32 48.5 36 44.5' stroke='%237A2E1E' stroke-width='1.8' fill='none' stroke-linecap='round'/><path d='M45 56 L56 42' stroke='%238B5A2B' stroke-width='3' stroke-linecap='round'/><path d='M54.5 43.5 Q59 37 61.5 33.5 Q57 36 52.5 41.5Z' fill='%23E5574F'/></svg>") no-repeat center/contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));z-index:2;pointer-events:none;transform-origin:50% 100%;animation:brush .3s ease-in-out infinite alternate}
+@keyframes brush{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-10%) rotate(6deg)}}
+.cell.wrong::before{content:"";position:absolute;inset:2px;border:3px dashed var(--ng);border-radius:3px}
+.now{margin:8px 0 0;font-weight:700;color:var(--sub)}
+.now b{color:var(--ink);font-size:1.2rem}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0}
+.primary{background:var(--ok);color:var(--okText);border:0;font-weight:900;font-size:1.15rem;padding:12px 22px;border-radius:12px}
+.primary.stop{background:var(--ng);color:#fff}
+.ghost{background:transparent;border:2px solid var(--line);color:var(--ink);font-weight:700;padding:10px 14px;border-radius:12px}
+.speed{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--sub);font-weight:700}
+.speed input{width:120px}
+.result{min-height:1.6em;font-weight:900;font-size:1.1rem;color:var(--sub)}
+.result.ok{color:var(--ok)}
+.result.ng{color:var(--ng)}
+.result small{display:block;font-size:.95rem;font-weight:700;color:var(--ink);margin-top:4px}
+
+h2{font-size:1.05rem;margin:0 0 8px;display:flex;align-items:center;gap:10px}
+h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
+.palette{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.pal{border:0;border-radius:8px;padding:10px 12px;color:#fff;font-weight:700;background:var(--bc);min-height:44px;font-size:.95rem}
+.pal.t-move{color:#2B2100}
+.help{font-size:.85rem;color:var(--sub);font-weight:700;margin:0 0 14px}
+
+.prog{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px;min-height:200px}
+.prog.locked{pointer-events:none;opacity:.75}
+.misslock{pointer-events:none;opacity:.4;filter:grayscale(.7)}
+.blk{margin:4px 0}
+.bhead{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;border-radius:8px;background:var(--bc);color:#fff;font-weight:700;font-size:.98rem;min-height:44px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.t-move > .bhead{color:#2B2100}
+.cont > .bhead{border-radius:8px 8px 0 0}
+.binner{border-left:16px solid var(--bc);padding:4px 0 4px 8px;min-height:24px}
+.bfoot{height:14px;background:var(--bc);border-radius:0 0 8px 8px}
+.bhead select{font-weight:900;border:0;border-radius:6px;padding:4px 6px;background:rgba(255,255,255,.92);color:#1E3348;font-size:1rem}
+.blk.selected > .bhead{outline:3px solid var(--sel);outline-offset:2px}
+.tools{margin-left:auto;display:flex;gap:4px}
+.tools button{background:rgba(255,255,255,.92);border:0;border-radius:6px;min-width:38px;height:34px;font-weight:900;color:#1E3348}
+.cursor{border:2px dashed var(--sel);border-radius:8px;padding:6px 10px;color:var(--ink);font-weight:700;font-size:.85rem;margin:4px 0;background:var(--muted)}
+.addhere{display:block;width:100%;text-align:left;background:transparent;border:2px dashed var(--line);color:var(--sub);border-radius:8px;padding:6px 10px;font-weight:700;font-size:.85rem;margin:4px 0}
+.addhere.on{border-color:var(--sel);color:var(--ink);background:var(--muted)}
+.celebrate{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(10,20,30,.6);padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.celebrate[hidden]{display:none}
+.ccard{position:relative;background:var(--surface);color:var(--ink);border-radius:26px;padding:28px 34px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:pop .5s cubic-bezier(.2,1.4,.4,1) both;max-width:92vw;border:4px solid #F4B400}
+.ctitle{font-size:clamp(1.8rem,6vw,2.6rem);font-weight:900;color:var(--ok);margin:0 0 4px;letter-spacing:.05em}
+.perfect .ctitle{background:linear-gradient(90deg,#E5574F,#F0A030,#F4C400,#36B36F,#3E9BE0,#9161D0);-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 1.6s ease-in-out infinite alternate}
+.perfect .ccard{border-color:transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,#E5574F,#F4C400,#36B36F,#3E9BE0,#9161D0) border-box}
+.cname{font-weight:700;color:var(--sub);margin:0 0 10px}
+.secret .ccard{background:radial-gradient(circle at 50% 30%,#2A2350,#0F1222 70%);color:#FFFFFF;border-color:#9161D0;box-shadow:0 0 50px rgba(145,97,208,.7)}
+.secret .ctitle{color:#F4C400;text-shadow:0 0 16px rgba(244,196,0,.8);animation:glitch .9s steps(2,end) 3}
+.secret .cname{color:#C9B8F0}
+.secret .cmsg{font-size:1.3rem;font-weight:900}
+@keyframes glitch{0%{transform:translate(0)}25%{transform:translate(-3px,1px)}50%{transform:translate(3px,-1px)}75%{transform:translate(-1px,2px)}100%{transform:translate(0)}}
+.secretov{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(70,30,130,.94),rgba(4,4,14,.98) 72%);padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);overflow:hidden}
+.secretov[hidden]{display:none}
+.scard{position:relative;z-index:2;text-align:center;color:#fff;max-width:94vw}
+.sline{margin:0 0 14px;font-weight:900;opacity:0}
+.sline.nar{font-size:clamp(1.5rem,5.5vw,2.4rem);color:#DCCBFF;text-shadow:0 0 14px rgba(170,120,255,.95);animation:slideIn .45s ease-out forwards}
+.sline.icon{font-size:clamp(4.5rem,18vw,8rem);line-height:1.1;animation:iconIn .75s cubic-bezier(.2,1.6,.4,1) forwards;filter:drop-shadow(0 0 24px rgba(255,220,80,.9))}
+.sline.big{font-size:clamp(2.6rem,10vw,4.8rem);color:#FFD400;text-shadow:0 0 10px #FF8A00,0 0 34px rgba(255,140,0,.95),4px 4px 0 #7A2BD0;animation:slam .55s cubic-bezier(.2,1.4,.4,1) forwards,glowB .9s ease-in-out .6s infinite alternate;letter-spacing:.04em}
+.sline.msg{font-size:clamp(1.4rem,5vw,2.1rem);animation:slideIn .5s ease-out forwards}
+#sclose{margin-top:6px;font-size:1.2rem;padding:12px 34px}
+#sclose[hidden]{display:none}
+.gogo{position:absolute;inset:0;pointer-events:none;z-index:1}
+.gogo span{position:absolute;font-weight:900;font-size:clamp(2.6rem,9vw,5.4rem);color:rgba(200,180,255,.6);text-shadow:3px 3px 0 rgba(0,0,0,.7);animation:gogo .3s ease-in-out infinite alternate;transition:opacity .4s}
+.gogo.fade span{opacity:0!important;animation:none}
+.sflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:3}
+.sflash.go{animation:flash .7s ease-out}
+.shake{animation:shake .08s linear infinite}
+@keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(-7px,3px) rotate(-.5deg)}50%{transform:translate(6px,-4px) rotate(.5deg)}75%{transform:translate(-4px,-3px)}100%{transform:translate(4px,4px)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(24px) scale(.85);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+@keyframes iconIn{0%{opacity:0;transform:scale(0) rotate(-540deg)}70%{opacity:1;transform:scale(1.5) rotate(15deg)}100%{opacity:1;transform:scale(1)}}
+@keyframes slam{0%{opacity:0;transform:scale(3.4)}60%{opacity:1;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
+@keyframes glowB{from{filter:brightness(1)}to{filter:brightness(1.4)}}
+@keyframes gogo{from{transform:scale(1) rotate(var(--r));opacity:.35}to{transform:scale(1.18) rotate(var(--r));opacity:.85}}
+@keyframes flash{0%{opacity:.95}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){
+  .shake,.gogo span,.sline{animation:none!important;opacity:1!important}
+}
+.cstars{display:flex;justify-content:center;gap:clamp(8px,3vw,18px);margin:4px 0 12px}
+.cstar{font-size:clamp(3.2rem,12vw,5rem);line-height:1;transform:scale(0);display:inline-block}
+.cstar.on{color:#F4B400;text-shadow:0 0 20px rgba(244,180,0,.75),0 0 4px rgba(255,255,255,.8);animation:starIn .6s cubic-bezier(.2,1.6,.4,1) forwards}
+.cstar.off{color:var(--line);animation:starOff .35s ease-out forwards}
+.cmsg{font-weight:700;font-size:1.05rem;margin:0 0 16px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:45;overflow:hidden}
+.confetti i{position:absolute;top:-24px;width:10px;height:16px;border-radius:2px;animation:fall linear forwards}
+.confetti i.round{border-radius:50%;width:12px;height:12px}
+@keyframes pop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes starIn{0%{transform:scale(0) rotate(-200deg)}65%{transform:scale(1.35) rotate(12deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes starOff{from{transform:scale(0)}to{transform:scale(.85)}}
+@keyframes fall{to{transform:translate3d(var(--dx),112vh,0) rotate(var(--rot))}}
+@keyframes shine{from{filter:brightness(1)}to{filter:brightness(1.25)}}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important}
+  .ccard,.cstar.on,.cstar.off,.perfect .ctitle{animation:none!important}
+  .cstar{transform:none}
+  .confetti{display:none}
+}
+
+.cafro{width:116px;height:116px;margin:-78px auto 2px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M19 64 Q32 50 45 64Z' fill='%233E9BE0'/><g fill='%233B2416'><circle cx='20' cy='22' r='12'/><circle cx='32' cy='15' r='14'/><circle cx='44' cy='22' r='12'/><circle cx='14' cy='33' r='9'/><circle cx='50' cy='33' r='9'/><circle cx='32' cy='25' r='15'/></g><circle cx='32' cy='39' r='12.5' fill='%23F2C39A'/><g fill='%233B2416'><circle cx='21' cy='31' r='5.5'/><circle cx='26.5' cy='28.8' r='5.5'/><circle cx='32' cy='28.2' r='5.6'/><circle cx='37.5' cy='28.8' r='5.5'/><circle cx='43' cy='31' r='5.5'/><circle cx='19.6' cy='36.5' r='4'/><circle cx='44.4' cy='36.5' r='4'/></g><ellipse cx='27.5' cy='38' rx='1.8' ry='2.4' fill='%23222'/><ellipse cx='36.5' cy='38' rx='1.8' ry='2.4' fill='%23222'/><circle cx='24.5' cy='43' r='2.3' fill='%23F59A9A' opacity='.7'/><circle cx='39.5' cy='43' r='2.3' fill='%23F59A9A' opacity='.7'/><path d='M28 44.5 Q32 48.5 36 44.5' stroke='%237A2E1E' stroke-width='1.8' fill='none' stroke-linecap='round'/><path d='M45 56 L56 42' stroke='%238B5A2B' stroke-width='3' stroke-linecap='round'/><path d='M54.5 43.5 Q59 37 61.5 33.5 Q57 36 52.5 41.5Z' fill='%23E5574F'/></svg>") no-repeat center/contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));transform-origin:50% 100%;animation:afroJump .5s ease-in-out infinite alternate}
+.perfect .cafro{width:136px;height:136px;margin-top:-92px;animation-duration:.35s}
+@keyframes afroJump{from{transform:translateY(0) rotate(-6deg) scale(1)}to{transform:translateY(-16px) rotate(6deg) scale(1.05)}}
+.top{display:flex;flex-direction:column}
+.right{display:flex;flex-direction:column;gap:8px;min-width:0}
+.runbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.runbar .now{margin:0}
+@media (min-width:900px){
+  html,body{height:100%}
+  body{overflow:hidden}
+  main{height:100%;max-width:none;display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;padding:10px 16px 12px}
+  .top{flex-direction:row;align-items:stretch;gap:14px}
+  .top header{flex-direction:column;align-items:flex-start;justify-content:center;margin:0;gap:8px;flex:0 0 auto}
+  .top h1{margin:0;font-size:1.2rem}
+  .msel{min-width:13em}
+  .mission{flex:1;margin:0;padding:10px 16px;align-items:center}
+  .mtitle{font-size:1.3rem;margin:0 0 4px}
+  .target{width:118px}
+  .work{grid-template-columns:auto minmax(0,1fr);gap:16px;min-height:0;height:100%;align-items:stretch}
+  .left{height:100%;min-height:0}
+  .board{height:100%;aspect-ratio:1/1;grid-template-rows:repeat(10,1fr);max-width:58vw}
+  .board .cell{aspect-ratio:auto}
+  .right{height:100%;min-height:0}
+  #editor{display:flex;flex-direction:column;min-height:0;flex:1}
+  .palette{margin-bottom:4px}
+  .pal{padding:8px 10px;font-size:.88rem;min-height:40px}
+  .help{margin:0 0 6px;font-size:.8rem}
+  #editor h2{margin:0 0 6px}
+  .prog{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+  .result{min-height:1.4em;font-size:1rem}
+}
+@media (prefers-reduced-motion: reduce){ .cafro{animation:none} }
+</style>
+</head>
+<body>
+<main id="appmain">
+  <div class="top">
+    <header>
+      <h1 id="apptitle">わくわくプログラミング</h1>
+      <select class="msel" id="msel" aria-label="ミッションをえらぶ"></select>
+    </header>
+
+    <section class="mission" id="missioncard" aria-live="polite">
+      <div class="mtext">
+        <div class="mname" id="mname"></div>
+        <div class="mtitle" id="mtitle"></div>
+        <p class="mhint" id="mhint" hidden></p>
+        <div class="stars" id="mstars"></div>
+        <div class="lockform" id="lockform" hidden>
+          <input id="pw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="合言葉" placeholder="合言葉">
+          <button class="primary" id="pwok">あける</button>
+        </div>
+      </div>
+      <div class="target" id="target" hidden aria-label="つくる もよう"></div>
+    </section>
+  </div>
+
+  <div class="work">
+    <div class="left">
+      <div class="board" id="board" aria-label="1から100の数表"></div>
+    </div>
+    <div class="right">
+      <div class="runbar">
+        <button class="primary" id="run">▶ スタート</button>
+        <button class="ghost" id="wipe">色をけす</button>
+        <p class="now">いまの数：<b id="now">1</b></p>
+        <label class="speed">ゆっくり<input type="range" id="speed" min="0" max="10" value="6">はやく</label>
+      </div>
+      <div class="result" id="result" aria-live="polite"></div>
+      <div id="editor">
+        <div class="palette" id="palette"></div>
+        <p class="help">ブロックをタップすると、点線のところに入るよ。入れたブロックをタップすると、そのあとに入るようになるよ。</p>
+        <h2>プログラム（ブロック <span id="count">0</span>こ）<button class="ghost clr" id="clearprog">ぜんぶけす</button></h2>
+        <div class="prog" id="prog"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="celebrate" id="celebrate" hidden>
+    <div class="ccard" role="dialog" aria-modal="true" aria-labelledby="ctitle">
+      <div class="cafro" aria-hidden="true"></div>
+      <p class="ctitle" id="ctitle">ミッションクリア！</p>
+      <p class="cname" id="cname"></p>
+      <div class="cstars" id="cstars"></div>
+      <p class="cmsg" id="cmsg"></p>
+      <button class="primary" id="cclose">やったね！</button>
+    </div>
+  </div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+</main>
+
+<div class="secretov" id="secretov" hidden>
+  <div class="gogo" id="gogo" aria-hidden="true"></div>
+  <div class="sflash" id="sflash"></div>
+  <div class="scard" id="scard" role="dialog" aria-modal="true" aria-label="裏コマンド">
+    <div id="slines" aria-live="polite"></div>
+    <button class="primary" id="sclose" hidden>OK</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var COLORS = { '青':'var(--c-blue)', '赤':'var(--c-red)', '黄':'var(--c-yellow)', '緑':'var(--c-green)', '紫':'var(--c-purple)' };
+  var BC = { root:'var(--b-start)', repeat:'var(--b-repeat)', 'if':'var(--b-if)', paint:'var(--b-paint)', move:'var(--b-move)', reset:'var(--b-reset)' };
+
+  // ---------- ミッション ----------
+  function count(){ return countNodes(root); }
+  function countType(t){ return countNodes(root, t); }
+  var MISSIONS = [
+    { name:'ミッション0', title:'すべてのマスを青くぬれ！', open:true,
+      hint:'まずは操作になれよう。',
+      target:function(n){ return '青'; },
+      s2:{ t:'ブロック3こ以内', f:function(){ return count() <= 3; } } },
+    { name:'ミッション1', title:'2の倍数をすべて青くぬれ！',
+      target:function(n){ return n % 2 === 0 ? '青' : null; },
+      s2:{ t:'ブロック4こ以内', f:function(){ return count() <= 4; } },
+      s3:{ t:'「もし」を使わない', f:function(){ return countType('if') === 0; } } },
+    { name:'ミッション2', title:'3の倍数をすべて赤くぬれ！',
+      target:function(n){ return n % 3 === 0 ? '赤' : null; },
+      s2:{ t:'ブロック4こ以内', f:function(){ return count() <= 4; } },
+      s3:{ t:'「もし」を使わない', f:function(){ return countType('if') === 0; } } },
+    { name:'ミッション3', title:'4でわると1あまる数を緑にぬれ！',
+      hint:'1、5、9、… のような数だよ。',
+      target:function(n){ return n % 4 === 1 ? '緑' : null; },
+      s2:{ t:'ブロック4こ以内', f:function(){ return count() <= 4; } },
+      s3:{ t:'「もし」を使わない', f:function(){ return countType('if') === 0; } } },
+    { name:'もようミッション1', title:'この もようを つくれ！', pattern:true,
+      target:function(n){ return n % 6 === 0 ? '緑' : null; },
+      s2:{ t:'ブロック4こ以内', f:function(){ return count() <= 4; } },
+      s3:{ t:'「もし」を使わない', f:function(){ return countType('if') === 0; } } },
+    { name:'もようミッション2', title:'この もようを つくれ！', pattern:true,
+      target:function(n){ return n % 10 === 5 ? '黄' : null; },
+      s2:{ t:'ブロック4こ以内', f:function(){ return count() <= 4; } },
+      s3:{ t:'「もし」を使わない', f:function(){ return countType('if') === 0; } } },
+    { name:'もようミッション3', title:'この もようを つくれ！', pattern:true,
+      hint:'青と赤を同じマスにぬると、むらさきになるよ。',
+      target:function(n){ return n % 6 === 0 ? '紫' : n % 2 === 0 ? '青' : n % 3 === 0 ? '赤' : null; },
+      s2:{ t:'ブロック6こ以内', f:function(){ return count() <= 6; } },
+      s3:{ t:'「くり返す」を1回だけ使う', f:function(){ return countType('repeat') === 1; } } },
+    { name:'ボスミッション', title:'2・3・5・7の倍数を ぜんぶぬれ！', anyColor:true,
+      hint:'色はなんでもOK。',
+      target:function(n){ return (n % 2 === 0 || n % 3 === 0 || n % 5 === 0 || n % 7 === 0) ? 'any' : null; },
+      s2:{ t:'ブロック10こ以内', f:function(){ return count() <= 10; } },
+      s3:{ t:'「くり返す」を1回だけ使う', f:function(){ return countType('repeat') === 1; } },
+      after:'ぬられなかった数（1いがい）をよく見てみよう。どんなひみつがあるかな？' },
+    { name:'じゆうに作る', title:'すきなプログラムを作って動かしてみよう', target:null, open:true }
+  ];
+  // 合言葉（ここを書きかえれば変えられる）
+  var PW = ['', 'ばなな', 'りんご', 'もも', 'みかん', 'ぶどう', 'めろん', 'いちご', ''];
+  MISSIONS.forEach(function(m, i){ m.pw = PW[i]; });
+  function initialLocks(){ return MISSIONS.map(function(m){ return !!m.open; }); }
+  var unlocked = initialLocks();
+  try { var u = JSON.parse(localStorage.getItem('kazuhyo-unlocked4') || 'null'); if (Array.isArray(u)) unlocked = u; } catch (e) {}
+  MISSIONS.forEach(function(m, i){ if (m.open) unlocked[i] = true; });
+  function saveUnlocked(){ try { localStorage.setItem('kazuhyo-unlocked4', JSON.stringify(unlocked)); } catch (e) {} }
+
+  var mi = 0;
+  var best = [];
+  try { best = JSON.parse(localStorage.getItem('kazuhyo-best3') || '[]') || []; } catch (e) { best = []; }
+  function saveBest(){ try { localStorage.setItem('kazuhyo-best3', JSON.stringify(best)); } catch (e) {} }
+
+  // ---------- プログラムのデータ ----------
+  var uid = 1;
+  function mk(type){
+    var n = { id: uid++, type: type };
+    if (type === 'repeat') { n.n = 10; n.children = []; }
+    if (type === 'if') { n.d = 2; n.r = 0; n.children = []; }
+    if (type === 'paint') { n.color = '青'; }
+    if (type === 'move') { n.n = 1; }
+    return n;
+  }
+  var root = { id: 0, type: 'root', children: [] };
+  var cursor = { kind: 'end', node: root };
+  var selected = null;
+
+  function isCont(n){ return !!n.children; }
+  function countNodes(node, t){
+    var c = 0;
+    (node.children || []).forEach(function(ch){
+      if (!t || ch.type === t) c++;
+      c += countNodes(ch, t);
+    });
+    return c;
+  }
+  function findById(id, cur){
+    cur = cur || root;
+    if (cur.id === id) return cur;
+    var list = cur.children || [];
+    for (var i = 0; i < list.length; i++) { var r = findById(id, list[i]); if (r) return r; }
+    return null;
+  }
+  function findParent(target, cur){
+    cur = cur || root;
+    var list = cur.children || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] === target) return { parent: cur, index: i };
+      var r = findParent(target, list[i]);
+      if (r) return r;
+    }
+    return null;
+  }
+
+  function insert(type){
+    if (running || !unlocked[mi]) return;
+    var nb = mk(type);
+    if (cursor.kind === 'after') {
+      var p = findParent(cursor.node);
+      if (p) p.parent.children.splice(p.index + 1, 0, nb); else root.children.push(nb);
+    } else {
+      cursor.node.children.push(nb);
+    }
+    if (isCont(nb)) { cursor = { kind: 'end', node: nb }; selected = null; }
+    else { cursor = { kind: 'after', node: nb }; selected = nb.id; }
+    renderProgram();
+  }
+
+  // ---------- パレット ----------
+  var PAL = [
+    ['repeat', '□回くり返す'],
+    ['if', 'もし いまの数を□でわった あまりが□ならば'],
+    ['paint', '□色をぬる'],
+    ['move', 'いまの数を□大きくする'],
+    ['reset', 'いまの数を1にもどす']
+  ];
+  var palette = document.getElementById('palette');
+  PAL.forEach(function(p){
+    var b = document.createElement('button');
+    b.className = 'pal t-' + p[0];
+    b.style.setProperty('--bc', BC[p[0]]);
+    b.textContent = p[1];
+    b.addEventListener('click', function(){ insert(p[0]); });
+    palette.appendChild(b);
+  });
+
+  // ---------- プログラムの表示 ----------
+  function sel(id, field, opts, value){
+    var h = '<select data-id="' + id + '" data-field="' + field + '" aria-label="' + field + '">';
+    opts.forEach(function(o){ h += '<option value="' + o + '"' + (String(o) === String(value) ? ' selected' : '') + '>' + o + '</option>'; });
+    return h + '</select>';
+  }
+  function range(a, b){ var r = []; for (var i = a; i <= b; i++) r.push(i); return r; }
+  function headHTML(n){
+    if (n.type === 'root') return 'スタート';
+    if (n.type === 'repeat') return sel(n.id, 'n', range(1, 100), n.n) + '回 くり返す';
+    if (n.type === 'if') return 'もし いまの数を' + sel(n.id, 'd', range(2, 10), n.d) + 'でわった あまりが' + sel(n.id, 'r', range(0, n.d - 1), n.r) + 'ならば';
+    if (n.type === 'paint') return sel(n.id, 'color', ['青', '赤', '黄', '緑'], n.color) + '色をぬる';
+    if (n.type === 'move') return 'いまの数を' + sel(n.id, 'n', range(1, 10), n.n) + '大きくする';
+    if (n.type === 'reset') return 'いまの数を1にもどす';
+    return '';
+  }
+  function cursorEl(){
+    var d = document.createElement('div');
+    d.className = 'cursor';
+    d.textContent = '▶ ここに入るよ';
+    return d;
+  }
+  function renderNode(n){
+    var el = document.createElement('div');
+    el.className = 'blk t-' + n.type + (isCont(n) ? ' cont' : '') + (selected === n.id ? ' selected' : '');
+    el.style.setProperty('--bc', BC[n.type]);
+    var head = document.createElement('div');
+    head.className = 'bhead';
+    head.dataset.id = n.id;
+    head.innerHTML = headHTML(n);
+    if (selected === n.id && n.type !== 'root') {
+      var tools = document.createElement('span');
+      tools.className = 'tools';
+      tools.innerHTML = '<button data-tool="up" data-id="' + n.id + '" aria-label="上へ">↑</button>' +
+        '<button data-tool="down" data-id="' + n.id + '" aria-label="下へ">↓</button>' +
+        '<button data-tool="del" data-id="' + n.id + '" aria-label="けす">✕</button>';
+      head.appendChild(tools);
+    }
+    el.appendChild(head);
+    if (isCont(n)) {
+      var inner = document.createElement('div');
+      inner.className = 'binner';
+      n.children.forEach(function(c){
+        inner.appendChild(renderNode(c));
+        if (cursor.kind === 'after' && cursor.node === c) inner.appendChild(cursorEl());
+      });
+      var add = document.createElement('button');
+      var on = cursor.kind === 'end' && cursor.node === n;
+      add.className = 'addhere' + (on ? ' on' : '');
+      add.dataset.cont = n.id;
+      add.textContent = on ? '▶ ここに入るよ' : '＋ ここに入れる';
+      inner.appendChild(add);
+      el.appendChild(inner);
+      var foot = document.createElement('div');
+      foot.className = 'bfoot';
+      el.appendChild(foot);
+    }
+    return el;
+  }
+  var prog = document.getElementById('prog');
+  function renderProgram(){
+    prog.innerHTML = '';
+    prog.appendChild(renderNode(root));
+    document.getElementById('count').textContent = count();
+  }
+
+  prog.addEventListener('click', function(e){
+    if (running) return;
+    var t = e.target;
+    if (t.closest('select')) return;
+    var tool = t.closest('[data-tool]');
+    if (tool) { doTool(tool.dataset.tool, +tool.dataset.id); return; }
+    var add = t.closest('.addhere');
+    if (add) {
+      cursor = { kind: 'end', node: findById(+add.dataset.cont) || root };
+      selected = null;
+      renderProgram();
+      return;
+    }
+    var head = t.closest('.bhead');
+    if (head) {
+      var id = +head.dataset.id;
+      if (id === 0) { cursor = { kind: 'end', node: root }; selected = null; }
+      else { var n = findById(id); selected = id; cursor = { kind: 'after', node: n }; }
+      renderProgram();
+    }
+  });
+  prog.addEventListener('change', function(e){
+    var s = e.target;
+    if (!s.dataset || !s.dataset.field) return;
+    var n = findById(+s.dataset.id);
+    if (!n) return;
+    var f = s.dataset.field;
+    n[f] = f === 'color' ? s.value : +s.value;
+    if (f === 'd' && n.r >= n.d) n.r = 0;
+    renderProgram();
+  });
+
+  function doTool(kind, id){
+    var n = findById(id);
+    var p = findParent(n);
+    if (!p) return;
+    var arr = p.parent.children, i = p.index;
+    var gp = p.parent === root ? null : findParent(p.parent);
+    if (kind === 'up') {
+      if (i > 0) {
+        var prev = arr[i - 1];
+        arr.splice(i, 1);
+        if (isCont(prev)) prev.children.push(n);          // 上の「くり返す」などの中（いちばん下）に入る
+        else arr.splice(i - 1, 0, n);
+      } else if (gp) {
+        arr.splice(i, 1);
+        gp.parent.children.splice(gp.index, 0, n);        // 外に出て、入れ物の上へ
+      }
+    }
+    if (kind === 'down') {
+      if (i < arr.length - 1) {
+        var next = arr[i + 1];
+        arr.splice(i, 1);
+        if (isCont(next)) next.children.unshift(n);       // 下の「くり返す」などの中（いちばん上）に入る
+        else arr.splice(i + 1, 0, n);
+      } else if (gp) {
+        arr.splice(i, 1);
+        gp.parent.children.splice(gp.index + 1, 0, n);    // 外に出て、入れ物の下へ
+      }
+    }
+    if (kind === 'up' || kind === 'down') cursor = { kind: 'after', node: n };
+    if (kind === 'del') {
+      arr.splice(i, 1);
+      selected = null;
+      cursor = i > 0 ? { kind: 'after', node: arr[i - 1] } : { kind: 'end', node: p.parent };
+    }
+    renderProgram();
+  }
+  var clearArm = null;
+  document.getElementById('clearprog').addEventListener('click', function(){
+    var b = this;
+    if (running || !root.children.length) return;
+    if (!clearArm) {
+      b.textContent = 'もう一度おすと消えるよ';
+      clearArm = setTimeout(function(){ clearArm = null; b.textContent = 'ぜんぶけす'; }, 3000);
+      return;
+    }
+    clearTimeout(clearArm); clearArm = null;
+    b.textContent = 'ぜんぶけす';
+    root.children = [];
+    cursor = { kind: 'end', node: root };
+    selected = null;
+    renderProgram();
+  });
+
+  // ---------- 数表 ----------
+  var boardEl = document.getElementById('board');
+  var cells = [];
+  for (var i = 1; i <= 100; i++) {
+    var c = document.createElement('div');
+    c.className = 'cell';
+    c.textContent = i;
+    boardEl.appendChild(c);
+    cells.push(c);
+  }
+  var overBan = document.createElement('div');
+  overBan.className = 'overban';
+  overBan.setAttribute('aria-live', 'polite');
+  overBan.innerHTML = '100をこえたよ！<small>ここでストップ！</small>';
+  boardEl.appendChild(overBan);
+  function showOver(){
+    overBan.classList.remove('show');
+    void overBan.offsetWidth;
+    overBan.classList.add('show');
+    tone(880, 0, 0.15, 0.12); tone(660, 0.16, 0.25, 0.12);
+  }
+  var paints = {};
+  var curPos = 1;
+  var wrong = {};
+  function displayColor(n){
+    var a = paints[n];
+    if (!a || !a.length) return null;
+    if (a.indexOf('青') >= 0 && a.indexOf('赤') >= 0) return '紫';
+    return a[a.length - 1];
+  }
+  function paintCell(el, color){
+    el.style.background = color ? COLORS[color] : '';
+    el.style.color = color ? (color === '黄' ? '#2B2100' : '#FFFFFF') : '';
+  }
+  function renderBoard(){
+    for (var n = 1; n <= 100; n++) {
+      var el = cells[n - 1];
+      paintCell(el, displayColor(n));
+      el.classList.toggle('cur', curPos === n);
+      el.classList.toggle('wrong', !!wrong[n]);
+    }
+    document.getElementById('now').textContent = curPos;
+  }
+  function wipe(){
+    paints = {}; curPos = 1; wrong = {};
+    renderBoard();
+  }
+
+  // ---------- 実行 ----------
+  var running = false, timer = null, acts = [], ai = 0;
+  var DELAYS = [450, 340, 250, 185, 135, 100, 75, 56, 42, 32, 24];
+  function compile(){
+    var out = [], cur = 1, steps = 0;
+    function exec(list){
+      for (var i = 0; i < list.length; i++) {
+        var b = list[i];
+        if (++steps > 60000) throw new Error('long');
+        if (b.type === 'repeat') { for (var k = 0; k < b.n; k++) exec(b.children); }
+        else if (b.type === 'if') { if (cur % b.d === b.r) exec(b.children); }
+        else if (b.type === 'paint') { out.push({ t: 'paint', n: cur, c: b.color }); }
+        else if (b.type === 'move') { cur += b.n; out.push({ t: 'move', n: cur }); if (cur > 100) throw { over: true }; }
+        else if (b.type === 'reset') { cur = 1; out.push({ t: 'move', n: 1 }); }
+      }
+    }
+    try { exec(root.children); }
+    catch (e) { if (e && e.over) out.over = true; else throw e; }
+    return out;
+  }
+  function apply(a){
+    if (a.t === 'paint') { if (a.n >= 1 && a.n <= 100) { (paints[a.n] = paints[a.n] || []).push(a.c); } }
+    else { curPos = a.n; }
+  }
+  var runBtn = document.getElementById('run');
+  function setRunning(v){
+    running = v;
+    runBtn.textContent = v ? '■ とめる' : '▶ スタート';
+    runBtn.classList.toggle('stop', v);
+    prog.classList.toggle('locked', v);
+  }
+  function tick(){
+    if (!running) return;
+    var d = DELAYS[+document.getElementById('speed').value];
+    var batch = acts.length > 3000 ? 3 : 1;
+    for (var k = 0; k < batch && ai < acts.length; k++) apply(acts[ai++]);
+    renderBoard();
+    if (ai < acts.length) timer = setTimeout(tick, d);
+    else { setRunning(false); if (acts.over) showOver(); judge(); }
+  }
+  runBtn.addEventListener('click', function(){
+    ensureAudio();
+    if (running) { clearTimeout(timer); setRunning(false); setResult('とちゅうで止めたよ', ''); return; }
+    if (!unlocked[mi]) { setResult('鍵をあけてからスタートしよう', ''); return; }
+    if (!root.children.length) { setResult('ブロックを入れてからスタートしよう', ''); return; }
+    try { acts = compile(); }
+    catch (e) { setResult('プログラムが長すぎるよ。くり返しの回数を見直そう', 'ng'); return; }
+    wipe();
+    setResult('', '');
+    ai = 0;
+    setRunning(true);
+    tick();
+  });
+  document.getElementById('wipe').addEventListener('click', function(){
+    if (running) return;
+    wipe(); setResult('', '');
+  });
+
+  // ---------- クリアの演出 ----------
+  var actx = null;
+  function ensureAudio(){
+    try {
+      if (!actx) { var AC = window.AudioContext || window.webkitAudioContext; if (AC) actx = new AC(); }
+      if (actx && actx.state === 'suspended') actx.resume();
+    } catch (e) {}
+  }
+  function tone(freq, t0, dur, vol){
+    if (!actx) return;
+    try {
+      var o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + t0;
+      o.type = 'triangle';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol || 0.16, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t); o.stop(t + dur + 0.05);
+    } catch (e) {}
+  }
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CONF_COLORS = ['#E5574F', '#F0A030', '#F4C400', '#36B36F', '#3E9BE0', '#9161D0', '#FF7EB6'];
+  function burst(n, delay){
+    if (reduceMotion) return;
+    var box = document.getElementById('confetti');
+    setTimeout(function(){
+      for (var k = 0; k < n; k++) {
+        var p = document.createElement('i');
+        if (Math.random() < 0.3) p.className = 'round';
+        p.style.left = (Math.random() * 100) + '%';
+        p.style.background = CONF_COLORS[k % CONF_COLORS.length];
+        p.style.setProperty('--dx', (Math.random() * 240 - 120) + 'px');
+        p.style.setProperty('--rot', (Math.random() * 1080 - 540) + 'deg');
+        p.style.animationDuration = (2.2 + Math.random() * 1.8) + 's';
+        p.style.animationDelay = (Math.random() * 0.5) + 's';
+        box.appendChild(p);
+        (function(el){ setTimeout(function(){ el.remove(); }, 4800); })(p);
+      }
+    }, delay || 0);
+  }
+  var celebrateEl = document.getElementById('celebrate');
+  function celebrate(m, stars, maxS, msg){
+    var perfect = stars === maxS;
+    celebrateEl.classList.toggle('perfect', perfect);
+    celebrateEl.classList.remove('secret');
+    document.getElementById('cclose').textContent = 'やったね！';
+    document.getElementById('ctitle').textContent = perfect ? 'パーフェクト！' : 'ミッションクリア！';
+    document.getElementById('cname').textContent = m.name;
+    document.getElementById('cmsg').textContent = msg;
+    var box = document.getElementById('cstars');
+    box.innerHTML = '';
+    var NOTES = [1047, 1319, 1568];
+    for (var k = 0; k < maxS; k++) {
+      var s = document.createElement('span');
+      var delay = 0.45 + k * 0.5;
+      s.className = 'cstar ' + (k < stars ? 'on' : 'off');
+      s.textContent = '★';
+      s.style.animationDelay = delay + 's';
+      box.appendChild(s);
+      if (k < stars) { tone(NOTES[k], delay, 0.5); burst(25, delay * 1000); }
+    }
+    burst(40, 0);
+    tone(784, 0, 0.18, 0.12); tone(1047, 0.12, 0.25, 0.12);
+    if (perfect) {
+      var end = 0.45 + maxS * 0.5;
+      [1047, 1319, 1568, 2093].forEach(function(f, j){ tone(f, end + j * 0.09, 0.45, 0.13); });
+      burst(80, end * 1000);
+    }
+    celebrateEl.hidden = false;
+    document.getElementById('cclose').focus();
+  }
+  function closeCelebrate(){ celebrateEl.hidden = true; }
+  function showSecretOld(opened){
+    celebrateEl.classList.remove('perfect');
+    celebrateEl.classList.add('secret');
+    document.getElementById('ctitle').textContent = '裏コマンド発動！';
+    document.getElementById('cname').textContent = opened ? 'ひみつの力がときはなたれた…' : 'ひみつの力がふういんされた…';
+    document.getElementById('cmsg').textContent = opened ? 'すべての鍵が外れたぞ！' : 'すべての鍵がもとにもどったぞ！';
+    document.getElementById('cclose').textContent = 'OK';
+    var box = document.getElementById('cstars');
+    box.innerHTML = '';
+    var s = document.createElement('span');
+    s.className = 'cstar on';
+    s.textContent = opened ? '🔓' : '🔒';
+    s.style.animationDelay = '0.3s';
+    box.appendChild(s);
+    if (opened) {
+      [523, 659, 784, 1047, 1319, 1568].forEach(function(f, j){ tone(f, j * 0.08, 0.35, 0.13); });
+      burst(70, 300);
+    } else {
+      [784, 659, 523, 392].forEach(function(f, j){ tone(f, j * 0.1, 0.35, 0.12); });
+    }
+    celebrateEl.hidden = false;
+    document.getElementById('cclose').focus();
+  }
+  document.getElementById('cclose').addEventListener('click', closeCelebrate);
+  celebrateEl.addEventListener('click', function(e){ if (e.target === celebrateEl) closeCelebrate(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !celebrateEl.hidden) closeCelebrate(); });
+
+  // ---------- 裏コマンドの演出 ----------
+  var rumbleGain = null;
+  function rumble(dur){
+    if (!actx) return;
+    try {
+      var t = actx.currentTime;
+      var g = actx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.4, t + 0.35);
+      g.gain.setValueAtTime(0.4, t + dur - 0.4);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      var lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 200;
+      var o1 = actx.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 41;
+      var o2 = actx.createOscillator(); o2.type = 'sawtooth'; o2.frequency.value = 47;
+      var trem = actx.createGain(); trem.gain.value = 0.6;
+      var lfo = actx.createOscillator(); lfo.frequency.value = 12;
+      var lfoG = actx.createGain(); lfoG.gain.value = 0.45;
+      lfo.connect(lfoG); lfoG.connect(trem.gain);
+      o1.connect(lp); o2.connect(lp); lp.connect(trem); trem.connect(g); g.connect(actx.destination);
+      [o1, o2, lfo].forEach(function(o){ o.start(t); o.stop(t + dur + 0.1); });
+      rumbleGain = g;
+    } catch (e) {}
+  }
+  function stopRumble(){
+    if (!rumbleGain || !actx) return;
+    try {
+      var t = actx.currentTime;
+      rumbleGain.gain.cancelScheduledValues(t);
+      rumbleGain.gain.setValueAtTime(Math.max(rumbleGain.gain.value, 0.001), t);
+      rumbleGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+    } catch (e) {}
+    rumbleGain = null;
+  }
+  function sweep(t0, f1, f2, dur, vol, vib){
+    if (!actx) return;
+    try {
+      var t = actx.currentTime + t0, v = vol || 0.12;
+      var o = actx.createOscillator(), o2 = actx.createOscillator(), g = actx.createGain();
+      o.type = 'sawtooth'; o2.type = 'square';
+      o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+      o2.frequency.setValueAtTime(f1 * 1.012, t); o2.frequency.exponentialRampToValueAtTime(f2 * 1.012, t + dur);
+      if (vib) {
+        var l = actx.createOscillator(), lg = actx.createGain();
+        l.frequency.value = 17; lg.gain.value = vib;
+        l.connect(lg); lg.connect(o.frequency); lg.connect(o2.frequency);
+        l.start(t); l.stop(t + dur + 0.35);
+      }
+      var bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1700; bp.Q.value = 0.6;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(v, t + 0.03);
+      g.gain.setValueAtTime(v, t + dur * 0.85);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.28);
+      o.connect(bp); o2.connect(bp); bp.connect(g); g.connect(actx.destination);
+      o.start(t); o2.start(t); o.stop(t + dur + 0.32); o2.stop(t + dur + 0.32);
+    } catch (e) {}
+  }
+  function kyuin(up){
+    if (up) { sweep(0, 500, 2100, 0.2, 0.12); sweep(0.24, 500, 2100, 0.2, 0.12); }
+    else { sweep(0, 2100, 500, 0.2, 0.12); sweep(0.24, 2100, 500, 0.2, 0.12); }
+  }
+  var secretEl = document.getElementById('secretov');
+  var slines = document.getElementById('slines');
+  var sclose = document.getElementById('sclose');
+  var gogoEl = document.getElementById('gogo');
+  var appMain = document.getElementById('appmain');
+  var scard = document.getElementById('scard');
+  var secretTimers = [];
+  function sAt(ms, fn){ secretTimers.push(setTimeout(fn, ms)); }
+  function addLine(cls, text){
+    var p = document.createElement('p');
+    p.className = 'sline ' + cls;
+    p.textContent = text;
+    slines.appendChild(p);
+  }
+  function setShake(on){
+    if (reduceMotion) on = false;
+    appMain.classList.toggle('shake', on);
+    scard.classList.toggle('shake', on);
+  }
+  function showSecret(opened){
+    secretTimers.forEach(clearTimeout); secretTimers = [];
+    slines.innerHTML = '';
+    sclose.hidden = true;
+    gogoEl.innerHTML = '';
+    gogoEl.classList.remove('fade');
+    var spots = [[4,8],[78,6],[10,40],[84,38],[6,74],[80,72],[42,4],[44,84],[22,20],[66,22],[24,60],[64,58]];
+    spots.forEach(function(p){
+      var s = document.createElement('span');
+      s.textContent = 'ゴ';
+      s.style.left = p[0] + '%';
+      s.style.top = p[1] + '%';
+      s.style.setProperty('--r', (Math.random() * 40 - 20) + 'deg');
+      s.style.animationDelay = (Math.random() * 0.3) + 's';
+      gogoEl.appendChild(s);
+    });
+    secretEl.hidden = false;
+    setShake(true);
+    rumble(3.2);
+
+    sAt(500, function(){ addLine('nar', 'ひみつの力が…'); kyuin(opened); });
+    sAt(1350, function(){ addLine('nar', opened ? 'ときはなたれる…！！' : 'ふういんされる…！！'); kyuin(opened); });
+    sAt(2200, function(){
+      var f = document.getElementById('sflash');
+      f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+      addLine('icon', opened ? '🔓' : '🔒');
+      if (opened) sweep(0, 260, 2900, 1.05, 0.14, 45); else sweep(0, 2600, 180, 1.05, 0.14, 45);
+    });
+    sAt(3250, function(){
+      setShake(false);
+      stopRumble();
+      gogoEl.classList.add('fade');
+      addLine('big', '裏コマンド発動！');
+      if (opened) {
+        [1047, 1319, 1568, 2093, 2637].forEach(function(fr, j){ tone(fr, j * 0.08, 0.5, 0.13); });
+        burst(110, 0); burst(60, 600);
+      } else {
+        [784, 659, 523, 392].forEach(function(fr, j){ tone(fr, j * 0.12, 0.45, 0.12); });
+      }
+    });
+    sAt(3950, function(){
+      addLine('msg', opened ? 'すべての鍵が外れたぞ！' : 'すべての鍵がもとにもどったぞ！');
+      sclose.hidden = false;
+      sclose.focus();
+    });
+  }
+  function closeSecret(){
+    secretTimers.forEach(clearTimeout); secretTimers = [];
+    setShake(false);
+    stopRumble();
+    secretEl.hidden = true;
+  }
+  sclose.addEventListener('click', closeSecret);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !secretEl.hidden) closeSecret(); });
+
+  // ---------- 判定 ----------
+  var resultEl = document.getElementById('result');
+  function setResult(text, cls, extra){
+    resultEl.className = 'result' + (cls ? ' ' + cls : '');
+    resultEl.textContent = text;
+    if (extra) { var s = document.createElement('small'); s.textContent = extra; resultEl.appendChild(s); }
+  }
+  function judge(){
+    var m = MISSIONS[mi];
+    if (!m.target) { setResult('おわり！どんな もようになったかな？', ''); return; }
+    var miss = 0;
+    wrong = {};
+    for (var n = 1; n <= 100; n++) {
+      var got = displayColor(n), want = m.target(n);
+      var bad = m.anyColor ? (!!got !== !!want) : ((got || null) !== (want || null));
+      if (bad) { wrong[n] = true; miss++; }
+    }
+    renderBoard();
+    if (miss) { setResult('おしい！ちがうマスが ' + miss + 'こ あるよ（点線のマス）', 'ng'); return; }
+    var stars = 1 + (m.s2 && m.s2.f() ? 1 : 0) + (m.s3 && m.s3.f() ? 1 : 0);
+    var maxS = 1 + (m.s2 ? 1 : 0) + (m.s3 ? 1 : 0);
+    if (!best[mi] || stars > best[mi]) { best[mi] = stars; saveBest(); buildSelect(); }
+    var starStr = '★★★'.slice(0, stars) + '☆☆☆'.slice(0, maxS - stars);
+    setResult('ミッションクリア！ ' + starStr, 'ok', m.after || (stars < maxS ? 'もっと星をとれるかな？' : 'パーフェクト！'));
+    celebrate(m, stars, maxS, m.after || (stars < maxS ? 'もっと星をとれるかな？' : 'すべての星をゲット！'));
+  }
+
+  // ---------- ミッションの表示 ----------
+  var msel = document.getElementById('msel');
+  function buildSelect(){
+    msel.innerHTML = '';
+    MISSIONS.forEach(function(m, i){
+      var o = document.createElement('option');
+      o.value = i;
+      var mx = 1 + (m.s2 ? 1 : 0) + (m.s3 ? 1 : 0);
+      var b = best[i] ? '　' + '★★★'.slice(0, best[i]) + '☆☆☆'.slice(0, mx - best[i]) : '';
+      o.textContent = (unlocked[i] ? '' : '🔒 ') + m.name + (m.target && unlocked[i] ? b : '');
+      if (i === mi) o.selected = true;
+      msel.appendChild(o);
+    });
+  }
+  function showMission(){
+    var m = MISSIONS[mi];
+    var lockform = document.getElementById('lockform');
+    if (!unlocked[mi]) {
+      document.getElementById('mname').textContent = m.name;
+      document.getElementById('mtitle').textContent = '🔒 このミッションには鍵がかかっているよ';
+      var lh = document.getElementById('mhint');
+      lh.hidden = false;
+      lh.textContent = '先生から合言葉をもらって入れてね。';
+      document.getElementById('mstars').innerHTML = '';
+      document.getElementById('target').hidden = true;
+      lockform.hidden = false;
+      var ed = document.getElementById('editor');
+      ed.classList.add('misslock');
+      ed.setAttribute('aria-disabled', 'true');
+      wipe();
+      setResult('', '');
+      return;
+    }
+    lockform.hidden = true;
+    var ed2 = document.getElementById('editor');
+    ed2.classList.remove('misslock');
+    ed2.removeAttribute('aria-disabled');
+    document.getElementById('mname').textContent = m.name;
+    document.getElementById('mtitle').textContent = m.title;
+    var hint = document.getElementById('mhint');
+    hint.hidden = !m.hint;
+    hint.textContent = m.hint || '';
+    var st = document.getElementById('mstars');
+    st.innerHTML = '';
+    if (m.target) {
+      [['★', 'クリア'], ['★★', m.s2 && m.s2.t], ['★★★', m.s3 && m.s3.t]].forEach(function(s){
+        if (!s[1]) return;
+        var sp = document.createElement('span');
+        sp.textContent = s[0] + ' ' + s[1];
+        st.appendChild(sp);
+      });
+    }
+    var tg = document.getElementById('target');
+    tg.hidden = !m.pattern;
+    tg.innerHTML = '';
+    if (m.pattern) {
+      for (var n = 1; n <= 100; n++) {
+        var d = document.createElement('div');
+        d.textContent = n;
+        paintCell(d, m.target(n));
+        tg.appendChild(d);
+      }
+    }
+    wipe();
+    setResult('', '');
+  }
+  msel.addEventListener('change', function(){
+    if (running) { clearTimeout(timer); setRunning(false); }
+    mi = +msel.value;
+    showMission();
+  });
+
+  // 合言葉で鍵をあける
+  var pwInput = document.getElementById('pw');
+  function norm(s){
+    return s.replace(/\s+/g, '').replace(/[\u30a1-\u30f6]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0x60); }).toLowerCase();
+  }
+  function tryPw(){
+    var v = norm(pwInput.value);
+    if (v && v === norm(MISSIONS[mi].pw)) {
+      unlocked[mi] = true;
+      saveUnlocked();
+      pwInput.value = '';
+      pwInput.blur();
+      buildSelect();
+      showMission();
+      setResult('鍵があいた！ミッションスタート！', 'ok');
+    } else {
+      setResult('合言葉がちがうよ', 'ng');
+    }
+  }
+  document.getElementById('pwok').addEventListener('click', tryPw);
+  pwInput.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.isComposing) tryPw(); });
+
+  // 先生用の裏コマンド：ミッションのところを5秒長押しで、ぜんぶの鍵をあける／もう一度でもとにもどす
+  var titleEl = document.getElementById('missioncard');
+  var pressX = 0, pressY = 0;
+  var titleTimer = null;
+  titleEl.addEventListener('pointerdown', function(e){
+    if (e.target.closest('input, button, select')) return;
+    ensureAudio();
+    pressX = e.clientX; pressY = e.clientY;
+    clearTimeout(titleTimer);
+    titleTimer = setTimeout(function(){
+      var all = MISSIONS.every(function(_, i){ return unlocked[i]; });
+      unlocked = all ? initialLocks() : MISSIONS.map(function(){ return true; });
+      saveUnlocked();
+      buildSelect();
+      showMission();
+      setResult(all ? '鍵をもとにもどしたよ（先生用）' : 'ぜんぶの鍵をあけたよ（先生用）', '');
+      showSecret(!all);
+    }, 5000);
+  });
+  ['pointerup', 'pointercancel'].forEach(function(ev){
+    titleEl.addEventListener(ev, function(){ clearTimeout(titleTimer); });
+  });
+  titleEl.addEventListener('pointermove', function(e){
+    if (Math.abs(e.clientX - pressX) > 18 || Math.abs(e.clientY - pressY) > 18) clearTimeout(titleTimer);
+  });
+  titleEl.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  buildSelect();
+  showMission();
+  renderProgram();
+})();
+</script>
+</body>
+</html>
