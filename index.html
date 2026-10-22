@@ -174,7 +174,7 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
 .runbar .now{margin:0}
 @media (min-width:900px){
   html,body{height:100%}
-  body{overflow:hidden}
+  body{overflow-x:hidden}
   main{height:100%;max-width:none;display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;padding:10px 16px 12px}
   .top{flex-direction:row;align-items:stretch;gap:14px}
   .top header{flex-direction:column;align-items:flex-start;justify-content:center;margin:0;gap:8px;flex:0 0 auto}
@@ -188,12 +188,13 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
   .board{height:100%;aspect-ratio:1/1;grid-template-rows:repeat(10,1fr);max-width:58vw}
   .board .cell{aspect-ratio:auto}
   .right{height:100%;min-height:0}
-  #editor{display:flex;flex-direction:column;min-height:0;flex:1}
+  /* ふだんは1画面におさめる。プログラムが長くなったら、ページ全体をスクロールして見られるようにのばす */
+  #editor{display:flex;flex-direction:column;flex:1 0 auto;padding-bottom:12px}
   .palette{margin-bottom:4px}
   .pal{padding:8px 10px;font-size:.88rem;min-height:40px}
   .help{margin:0 0 6px;font-size:.8rem}
   #editor h2{margin:0 0 6px}
-  .prog{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+  .prog{flex:1 0 auto}
   .result{min-height:1.4em;font-size:1rem}
 }
 @media (prefers-reduced-motion: reduce){ .cafro{animation:none} }
