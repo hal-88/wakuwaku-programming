@@ -610,7 +610,7 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
         if (b.type === 'repeat') { for (var k = 0; k < b.n; k++) exec(b.children); }
         else if (b.type === 'if') { if (cur % b.d === b.r) exec(b.children); }
         else if (b.type === 'paint') { out.push({ t: 'paint', n: cur, c: b.color }); }
-        else if (b.type === 'move') { cur += b.n; out.push({ t: 'move', n: cur }); if (cur > 100) throw { over: true }; }
+        else if (b.type === 'move') { var was = cur; cur += b.n; out.push({ t: 'move', n: cur }); if (was <= 100 && cur > 100) out.push({ t: 'over' }); }
         else if (b.type === 'reset') { cur = 1; out.push({ t: 'move', n: 1 }); }
       }
     }
@@ -619,6 +619,7 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
     return out;
   }
   function apply(a){
+    if (a.t === 'over') { showOver(); return; }
     if (a.t === 'paint') { if (a.n >= 1 && a.n <= 100) { (paints[a.n] = paints[a.n] || []).push(a.c); } }
     else { curPos = a.n; }
   }
@@ -633,7 +634,11 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
     if (!running) return;
     var d = DELAYS[+document.getElementById('speed').value];
     var batch = acts.length > 3000 ? 3 : 1;
-    for (var k = 0; k < batch && ai < acts.length; k++) apply(acts[ai++]);
+    for (var k = 0; k < batch && ai < acts.length; k++) {
+      apply(acts[ai++]);
+      // 100より先（数表の外）にいるあいだは、一瞬で進める
+      while (ai < acts.length && curPos > 100 && (acts[ai].t === 'over' || acts[ai].n > 100)) apply(acts[ai++]);
+    }
     renderBoard();
     if (ai < acts.length) timer = setTimeout(tick, d);
     else { setRunning(false); if (acts.over) showOver(); judge(); }
@@ -983,10 +988,17 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
     wipe();
     setResult('', '');
   }
+  // ミッションごとにプログラムを別々にとっておく
+  var programs = {};
   msel.addEventListener('change', function(){
     if (running) { clearTimeout(timer); setRunning(false); }
+    programs[mi] = { root: root, cursor: cursor, selected: selected };
     mi = +msel.value;
+    var saved = programs[mi];
+    if (saved) { root = saved.root; cursor = saved.cursor; selected = saved.selected; }
+    else { root = { id: 0, type: 'root', children: [] }; cursor = { kind: 'end', node: root }; selected = null; }
     showMission();
+    renderProgram();
   });
 
   // 合言葉で鍵をあける
