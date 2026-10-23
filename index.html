@@ -173,9 +173,9 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
 .runbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .runbar .now{margin:0}
 @media (min-width:900px){
-  html,body{height:100%}
-  body{overflow-x:hidden}
-  main{height:100%;max-width:none;display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;padding:10px 16px 12px}
+  html{height:100%}
+  body{min-height:100%;overflow-x:hidden}
+  main{min-height:100%;max-width:none;display:grid;grid-template-rows:auto 1fr;gap:12px;padding:10px 16px 12px}
   .top{flex-direction:row;align-items:stretch;gap:14px}
   .top header{flex-direction:column;align-items:flex-start;justify-content:center;margin:0;gap:8px;flex:0 0 auto}
   .top h1{margin:0;font-size:1.2rem}
@@ -183,18 +183,19 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
   .mission{flex:1;margin:0;padding:10px 16px;align-items:center}
   .mtitle{font-size:1.3rem;margin:0 0 4px}
   .target{width:118px}
-  .work{grid-template-columns:auto minmax(0,1fr);gap:16px;min-height:0;height:100%;align-items:stretch}
-  .left{height:100%;min-height:0}
+  /* --workh は「画面の高さ − 上のミッション欄」（スクリプトで計算）。数表はスクロールしても画面にのこる */
+  .work{grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:start}
+  .left{position:sticky;top:10px;height:var(--workh,calc(100vh - 150px))}
   .board{height:100%;aspect-ratio:1/1;grid-template-rows:repeat(10,1fr);max-width:58vw}
   .board .cell{aspect-ratio:auto}
-  .right{height:100%;min-height:0}
+  .right{min-height:var(--workh,calc(100vh - 150px))}
   /* ふだんは1画面におさめる。プログラムが長くなったら、ページ全体をスクロールして見られるようにのばす */
   #editor{display:flex;flex-direction:column;flex:1 0 auto;padding-bottom:12px}
   .palette{margin-bottom:4px}
   .pal{padding:8px 10px;font-size:.88rem;min-height:40px}
   .help{margin:0 0 6px;font-size:.8rem}
   #editor h2{margin:0 0 6px}
-  .prog{flex:1 0 auto}
+  .prog{flex:1 0 auto;min-height:120px}
   .result{min-height:1.4em;font-size:1rem}
 }
 @media (prefers-reduced-motion: reduce){ .cafro{animation:none} }
@@ -1055,6 +1056,16 @@ h2 .clr{margin-left:auto;font-size:.85rem;padding:6px 10px}
     if (Math.abs(e.clientX - pressX) > 18 || Math.abs(e.clientY - pressY) > 18) clearTimeout(titleTimer);
   });
   titleEl.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  // 広い画面：数表の高さを「画面の高さ − 上のミッション欄」に合わせる
+  var workEl = document.querySelector('.work');
+  function fitWork(){
+    var top = workEl.getBoundingClientRect().top + window.scrollY;
+    document.documentElement.style.setProperty('--workh', Math.max(240, Math.floor(document.documentElement.clientHeight - top - 12)) + 'px');
+  }
+  window.addEventListener('resize', fitWork);
+  if (window.ResizeObserver) new ResizeObserver(fitWork).observe(document.querySelector('.top'));
+  fitWork();
 
   buildSelect();
   showMission();
